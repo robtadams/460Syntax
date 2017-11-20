@@ -1,0 +1,4 @@
+Entering Program function; current token is: LPAREN_T
+Entering Define function; current token is: LPAREN_T
+Exiting Define function; current token is: LPAREN_T
+Exiting Program function; current token is: IDENT_T
