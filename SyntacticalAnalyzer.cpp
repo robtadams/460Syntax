@@ -146,6 +146,7 @@ int SyntacticalAnalyzer::Define ()
 
 
 int SyntacticalAnalyzer::More_Defines () {
+    p2file << "Entering More_Defines function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == EOF_T) {
@@ -154,24 +155,30 @@ int SyntacticalAnalyzer::More_Defines () {
     // has to be this becaus it is not lambda
     errors += Define();
     errors += More_Defines();
+    
+    p2file << "Exiting More_Defines function; current token is: " << lex->GetTokenName (token) << endl;
     return errors;
 }
 
 int SyntacticalAnalyzer::Param_List () {
+    p2file << "Entering Param_List function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == IDENT_T) {
         return Param_List();
     }
     else if (token == RPAREN_T) {
+        p2file << "Exiting Param_List function; current token is: " << lex->GetTokenName (token) << endl;
         return errors; // lambda
     }
     errors++;
     lex->ReportError ("Expecting ')'; saw " + lex->GetLexeme ());
+    p2file << "Exiting Param_List function; current token is: " << lex->GetTokenName (token) << endl;
     return errors;
 }
 
 int SyntacticalAnalyzer::Statement () {
+    p2file << "Entering Statement function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == IDENT_T) {
@@ -193,6 +200,7 @@ int SyntacticalAnalyzer::Statement () {
 }
 
 int SyntacticalAnalyzer::Statement_List () {
+    p2file << "Entering Statement_List function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == RPAREN_T) { // check for lambda
@@ -204,6 +212,7 @@ int SyntacticalAnalyzer::Statement_List () {
 }
 
 int SyntacticalAnalyzer::Statement_Pair () {
+    p2file << "Entering Statement_Pair function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == LPAREN_T) {
@@ -224,6 +233,7 @@ int SyntacticalAnalyzer::Statement_Pair () {
 }
 
 int SyntacticalAnalyzer::Statement_Pair_Body () {
+    p2file << "Entering Statement_Pair_Body function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == LPAREN_T) {
@@ -247,6 +257,7 @@ int SyntacticalAnalyzer::Statement_Pair_Body () {
 }
 
 int SyntacticalAnalyzer::Literal () {
+    p2file << "Entering Literal function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken(); // should we be getting this token before
     if (token == NUMLIT_T || token == STRLIT_T) {
@@ -261,12 +272,14 @@ int SyntacticalAnalyzer::Literal () {
 }
 
 int SyntacticalAnalyzer::Quoted_Lit () {
+    p2file << "Entering Quoted_Lit function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     errors += Any_Other_Token();
     return errors;
 }
 
 int SyntacticalAnalyzer::More_Tokens () {
+    p2file << "Entering More_Tokens function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == LAMBDA) {
@@ -277,6 +290,7 @@ int SyntacticalAnalyzer::More_Tokens () {
 }
 
 int SyntacticalAnalyzer::Any_Other_Token () {
+    p2file << "Entering Any_Other_Token function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     switch (token) {
@@ -326,6 +340,7 @@ int SyntacticalAnalyzer::Any_Other_Token () {
 }
 
 int SyntacticalAnalyzer::Action () {
+    p2file << "Entering Action function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     switch (token) {
@@ -421,6 +436,7 @@ int SyntacticalAnalyzer::Action () {
 }
 
 int SyntacticalAnalyzer::Else_Part() {
+    p2file << "Entering Else_Part function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == RPAREN_T) {
@@ -431,6 +447,7 @@ int SyntacticalAnalyzer::Else_Part() {
 }
 
 int SyntacticalAnalyzer::More_Pairs() {
+    p2file << "Entering More_Pairs function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     token = lex->GetToken();
     if (token == RPAREN_T) {

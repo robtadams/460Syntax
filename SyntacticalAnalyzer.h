@@ -25,21 +25,21 @@ class SyntacticalAnalyzer
 	LexicalAnalyzer * lex;
 	ofstream p2file;
 	token_type token;
-	int Program (); // done
-    int Define (); // done
-    int More_Defines (); // done
-    int Param_List (); //done
-    int Statement (); // done
-    int Statement_List (); // done
-    int Statement_Pair (); // done
+	int Program (); // test
+    int Define (); // test
+    int More_Defines (); // test
+    int Param_List (); //test
+    int Statement (); // test
+    int Statement_List (); // test
+    int Statement_Pair (); // test
     int Statement_Pair_Body (); // check for issue with Literal
-    int Literal ();  // done
-    int Quoted_Lit (); // done
-    int Any_Other_Token (); //
-    int More_Tokens ();
-    int Action (); // done
-    int Else_Part (); // done
-    int More_Pairs ();
+    int Literal ();  // test
+    int Quoted_Lit (); // test
+    int Any_Other_Token (); // test
+    int More_Tokens (); // test
+    int Action (); // test
+    int Else_Part (); // test
+    int More_Pairs (); // test
 };
 	
 #endif

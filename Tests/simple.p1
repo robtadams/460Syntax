@@ -1,0 +1,6 @@
+	LPAREN_T        (
+	DEFINE_T        define
+	LPAREN_T        (
+	IDENT_T         main
+	RPAREN_T        )
+	RPAREN_T        )
