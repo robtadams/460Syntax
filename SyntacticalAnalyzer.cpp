@@ -322,46 +322,47 @@ int SyntacticalAnalyzer::Any_Other_Token () {
                 errors++;
                 lex->ReportError ("Expecting ')'; saw " + lex->GetLexeme ());
             }
-            return errors;
-        case IDENT_T:   return errors;
-        case NUMLIT_T:  return errors;
-        case STRLIT_T:  return errors;
-        case CONS_T:  return errors;
-        case IF_T:  return errors;
-        case DISPLAY_T:   return errors;
-        case NEWLINE_T:  return errors;
-        case LISTOP_T:  return errors;
-        case AND_T:  return errors;
-        case OR_T:  return errors;
-        case NOT_T:   return errors;
-        case DEFINE_T:  return errors;
-        case NUMBERP_T:  return errors;
-        case SYMBOLP_T:  return errors;
-        case LISTP_T:  return errors;
-        case ZEROP_T:   return errors;
-        case NULLP_T:  return errors;
-        case STRINGP_T:  return errors;
-        case PLUS_T:  return errors;
-        case MINUS_T:  return errors;
-        case DIV_T:   return errors;
-        case MULT_T:  return errors;
-        case MODULO_T:  return errors;
-        case EQUALTO_T:  return errors;
-        case GT_T:  return errors;
-        case LT_T:   return errors;
-        case GTE_T:  return errors;
-        case LTE_T:  return errors;
+            break;
+        case IDENT_T:  break;
+        case NUMLIT_T:  break;
+        case STRLIT_T:  break;
+        case CONS_T:  break;
+        case IF_T:  break;
+        case DISPLAY_T:   break;
+        case NEWLINE_T:  break;
+        case LISTOP_T:  break;
+        case AND_T:  break;
+        case OR_T:  break;
+        case NOT_T:   break;
+        case DEFINE_T:  break;
+        case NUMBERP_T:  break;
+        case SYMBOLP_T:  break;
+        case LISTP_T:  break;
+        case ZEROP_T:   break;
+        case NULLP_T:  break;
+        case STRINGP_T:  break;
+        case PLUS_T:  break;
+        case MINUS_T:  break;
+        case DIV_T:   break;
+        case MULT_T:  break;
+        case MODULO_T:  break;
+        case EQUALTO_T:  break;
+        case GT_T:  break;
+        case LT_T:   break;
+        case GTE_T:  break;
+        case LTE_T:  break;
         case QUOTE_T:
             errors += Any_Other_Token();
-            return errors;
+            break;
         default:
             errors++;
             lex->ReportError ("Expecting TOKEN; saw " + lex->GetLexeme ());
     }
+    return errors; 
 }
 
 int SyntacticalAnalyzer::Action () {
-    // add gget token to each switch
+    // add gget token to each switch //done
     p2file << "Entering Action function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     if (token == EOF_T)
@@ -373,91 +374,92 @@ int SyntacticalAnalyzer::Action () {
             errors += Statement();
             errors += Statement();
             errors += Else_Part();
-            return errors;
+            break;
         case COND_T:
             errors += Statement_Pair();
             errors += More_Pairs();
-            return errors;
+            break;
         case LISTOP_T:
             errors += Statement();
-            return errors;
+            break;
         case CONS_T:
             errors += Statement();
             errors += Statement();
-            return errors;
+            break;
         case AND_T:
             errors += Statement_List();
-            return errors;
+            break;
         case OR_T:
             errors += Statement_List();
-            return errors;
+            break;
         case NOT_T:
             errors += Statement();
-            return errors;
+            break;
         case NUMBERP_T:
             errors += Statement();
-            return errors;
+            break;
         case SYMBOLP_T:
             errors += Statement();
-            return errors;
+            break;
         case LISTP_T:
             errors += Statement();
-            return errors;
+            break;
         case ZEROP_T:
             errors += Statement();
-            return errors;
+            break;
         case NULLP_T:
             errors += Statement();
-            return errors;
+            break;
         case STRINGP_T:
             errors += Statement();
-            return errors;
+            break;
         case PLUS_T:
             errors += Statement_List();
-            return errors;
+            break;
         case MINUS_T:
             errors += Statement();
             errors += Statement_List();
-            return errors;
+            break;
         case DIV_T:
             errors += Statement();
             errors += Statement_List();
-            return errors;
+            break;
         case MULT_T:
             errors += Statement_List();
-            return errors;
+            break;
         case MODULO_T:
             errors += Statement();
             errors += Statement();
-            return errors;
+            break;
         case EQUALTO_T:
             errors += Statement_List();
             return errors;
         case GT_T:
             errors += Statement_List();
-            return errors;
+            break;
         case LT_T:
             errors += Statement_List();
-            return errors;
+            break;
         case GTE_T:
             errors += Statement_List();
-            return errors;
+            break;
         case LTE_T:
             errors += Statement_List();
-            return errors;
+            break;
         case IDENT_T:
             errors += Statement_List();
-            return errors;
+            break;
         case DISPLAY_T:
             errors += Statement();
-            return errors;
+            break;
         case NEWLINE_T:
-            return errors;
+            break;
         default:
             errors++;
             lex->ReportError ("Expecting 'ACTION'; saw " + lex->GetLexeme ());
-            return errors;
     }
+    token = lex->GetToken();
+    return errors;
 }
 
 int SyntacticalAnalyzer::Else_Part() {
