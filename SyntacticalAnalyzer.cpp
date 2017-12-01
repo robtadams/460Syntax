@@ -88,15 +88,13 @@ int SyntacticalAnalyzer::Define ()
 	// token should be in firsts of Define
 	// Body of function goes here.
 
-    if (token == LPAREN_T) {
-		token = lex->GetToken ();
+    while (token != LPAREN_T && token != EOF_T)
+    {
+        errors++;
+        lex->ReportError ("Expecting '('; saw " + lex->GetLexeme ());
+        token = lex->GetToken ();
     }
-	else
-	{
-		errors++;
-		lex->ReportError ("Expecting '('; saw " + lex->GetLexeme ());
-	}
-	
+    token = lex->GetToken ();
 	while (token != DEFINE_T && token != EOF_T)
 	{
 		errors++;
@@ -190,17 +188,20 @@ int SyntacticalAnalyzer::Statement () {
         return errors;
     }
     else if(token == LPAREN_T) {
-        errors += Action();
-//        token = lex->GetToken();
+        errors += Action(); // getting token at end of action.
         while (token != RPAREN_T && token != EOF_T) {
             errors++;
             lex->ReportError ("Expecting ')'; saw " + lex->GetLexeme ());
-            token = lex->GetToken (); // should we get this?
+            token = lex->GetToken ();
         }
         return errors;
     }
-    if (token != EOF_T)
-        errors += Literal();
+    while (token != NUMLIT_T && token != STRLIT_T && token != QUOTE_T) {
+        errors++;
+        lex->ReportError ("Expecting NUMLIT_T, STRLIT_T, QUOTE_T; saw " + lex->GetLexeme ());
+        token = lex->GetToken ();
+    }
+    errors += Literal();
     
     return errors;
 }
@@ -212,6 +213,7 @@ int SyntacticalAnalyzer::Statement_List () {
         return errors;
     token = lex->GetToken();
     if (token == RPAREN_T) { // check for lambda
+        token = lex->GetToken();
         return errors;
     }
     if (token != EOF_T) {
@@ -458,7 +460,7 @@ int SyntacticalAnalyzer::Action () {
             errors++;
             lex->ReportError ("Expecting 'ACTION'; saw " + lex->GetLexeme ());
     }
-    token = lex->GetToken();
+//    token = lex->GetToken();
     return errors;
 }
 

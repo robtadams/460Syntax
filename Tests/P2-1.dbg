@@ -14,65 +14,89 @@ Input file: Tests/P2-1.ss
 	PLUS_T          +
 	LPAREN_T        (
 	MULT_T          *
+Error at 4,15: Expecting NUMLIT_T, STRLIT_T, QUOTE_T; saw *
 	NUMLIT_T        1.2
 	LPAREN_T        (
+Error at 4,21: Expecting 'LITERAL'; saw (
 	MINUS_T         -
 	NUMLIT_T        2
 	LPAREN_T        (
+Error at 4,26: Expecting 'LITERAL'; saw (
 	DIV_T           /
 	NUMLIT_T        1
 	NUMLIT_T        3
 	RPAREN_T        )
 	RPAREN_T        )
-Error at 4,33: Expecting 'LITERAL'; saw )
 	RPAREN_T        )
 	NUMLIT_T        -8.7
-Error at 4,39: Expecting ')'; saw -8.7
 	RPAREN_T        )
 	RPAREN_T        )
+Error at 4,41: Expecting '('; saw )
 	LPAREN_T        (
 	NEWLINE_T       newline
+Error at 4,50: Expecting 'define'; saw newline
 	RPAREN_T        )
-Error at 4,51: Expecting 'LITERAL'; saw )
+Error at 4,51: Expecting 'define'; saw )
    5: 	(display (/ (+ (/ 2 3) (/ 2 9)) (- (/ 5 1) (/ 2 3)))) (newline)
 	LPAREN_T        (
+Error at 5,2: Expecting 'define'; saw (
 	DISPLAY_T       display
+Error at 5,9: Expecting 'define'; saw display
 	LPAREN_T        (
-Error at 5,11: Expecting 'LITERAL'; saw (
+Error at 5,11: Expecting 'define'; saw (
 	DIV_T           /
+Error at 5,12: Expecting 'define'; saw /
 	LPAREN_T        (
+Error at 5,14: Expecting 'define'; saw (
 	PLUS_T          +
+Error at 5,15: Expecting 'define'; saw +
 	LPAREN_T        (
+Error at 5,17: Expecting 'define'; saw (
 	DIV_T           /
+Error at 5,18: Expecting 'define'; saw /
 	NUMLIT_T        2
+Error at 5,20: Expecting 'define'; saw 2
 	NUMLIT_T        3
+Error at 5,22: Expecting 'define'; saw 3
 	RPAREN_T        )
+Error at 5,23: Expecting 'define'; saw )
 	LPAREN_T        (
-Error at 5,25: Expecting 'LITERAL'; saw (
+Error at 5,25: Expecting 'define'; saw (
 	DIV_T           /
+Error at 5,26: Expecting 'define'; saw /
 	NUMLIT_T        2
+Error at 5,28: Expecting 'define'; saw 2
 	NUMLIT_T        9
+Error at 5,30: Expecting 'define'; saw 9
 	RPAREN_T        )
+Error at 5,31: Expecting 'define'; saw )
 	RPAREN_T        )
+Error at 5,32: Expecting 'define'; saw )
 	LPAREN_T        (
+Error at 5,34: Expecting 'define'; saw (
 	MINUS_T         -
+Error at 5,35: Expecting 'define'; saw -
 	LPAREN_T        (
-Error at 5,37: Expecting 'LITERAL'; saw (
+Error at 5,37: Expecting 'define'; saw (
 	DIV_T           /
+Error at 5,38: Expecting 'define'; saw /
 	NUMLIT_T        5
+Error at 5,40: Expecting 'define'; saw 5
 	NUMLIT_T        1
+Error at 5,42: Expecting 'define'; saw 1
 	RPAREN_T        )
+Error at 5,43: Expecting 'define'; saw )
 	LPAREN_T        (
-Error at 5,45: Expecting ')'; saw (
+Error at 5,45: Expecting 'define'; saw (
 	DIV_T           /
-Error at 5,46: Expecting ')'; saw /
+Error at 5,46: Expecting 'define'; saw /
 	NUMLIT_T        2
-Error at 5,48: Expecting ')'; saw 2
+Error at 5,48: Expecting 'define'; saw 2
 	NUMLIT_T        3
-Error at 5,50: Expecting ')'; saw 3
+Error at 5,50: Expecting 'define'; saw 3
 	RPAREN_T        )
+Error at 5,51: Expecting 'define'; saw )
 	RPAREN_T        )
-Error at 5,52: Expecting '('; saw )
 Error at 5,52: Expecting 'define'; saw )
 	RPAREN_T        )
 Error at 5,53: Expecting 'define'; saw )
@@ -222,4 +246,4 @@ Error at 8,51: Expecting 'define'; saw )
    9: )
 	RPAREN_T        )
 Error at 9,1: Expecting 'define'; saw )
-84 errors found in input file
+108 errors found in input file
