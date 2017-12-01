@@ -115,6 +115,7 @@ int SyntacticalAnalyzer::Define ()
         lex->ReportError ("Expecting 'IDENT_T'; saw " + lex->GetLexeme ());
         token = lex->GetToken ();
     }
+    token = lex->GetToken();
     
     errors += Param_List();
     
@@ -126,7 +127,7 @@ int SyntacticalAnalyzer::Define ()
     }
     
     token = lex->GetToken();
-    errors += Statement(); // Return Here
+    errors += Statement();
     errors += Statement_List();
     
     while (token != RPAREN_T && token != EOF_T)
@@ -135,6 +136,7 @@ int SyntacticalAnalyzer::Define ()
         lex->ReportError ("Expecting ')'; saw " + lex->GetLexeme ());
         token = lex->GetToken (); // should we get this?
     }
+    token = lex->GetToken();
     
     
 	// token should be in follows of Define
@@ -150,14 +152,11 @@ int SyntacticalAnalyzer::More_Defines () {
     if (token == EOF_T) {
         return errors; // lambda
     }
-    token = lex->GetToken();
-    if (token == LPAREN_T) {
-        errors += Statement();
-        errors += Statement_List();
-    }
     // has to be this becaus it is not lambda
-    errors += Define();
-    errors += More_Defines();
+    if (token == LPAREN_T) {
+        errors += Define();
+        errors += More_Defines();
+    }
     
     p2file << "Exiting More_Defines function; current token is: " << lex->GetTokenName (token) << endl;
     return errors;
@@ -168,8 +167,9 @@ int SyntacticalAnalyzer::Param_List () {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken();
+    
     if (token == IDENT_T) {
+        token = lex->GetToken();
         return Param_List();
     }
     else if (token == RPAREN_T) {
@@ -185,28 +185,23 @@ int SyntacticalAnalyzer::Param_List () {
 int SyntacticalAnalyzer::Statement () {
     p2file << "Entering Statement function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
-//    token = lex->GetToken();
-    if (token != IDENT_T && token != LPAREN_T && token != NUMLIT_T && token != STRLIT_T && token != QUOTE_T) {
-        errors++;
-        lex->ReportError ("Expecting Firsts of Statement; saw " + lex->GetLexeme ());
-        return errors;
-    }
     
-    if (token == IDENT_T || token == NUMLIT_T) {
+    if (token == IDENT_T) {
+        token = lex->GetToken();
         return errors;
     }
-    else if (token == NUMLIT_T || token == STRLIT_T || token == QUOTE_T) {
-        errors += Literal();
-    }
-    // token HAS to be a LPAREN_T at this point.
-    errors += Action(); // Return here 2
-    if (token != RPAREN_T) {
-        errors++;
-        lex->ReportError ("Expecting ); saw " + lex->GetLexeme ());
+    else if (token == LPAREN_T) {
+        token = lex->GetToken();
+        errors += Action(); // Return here 2
+        if (token != RPAREN_T) {
+            errors++;
+            lex->ReportError ("Expecting ); saw " + lex->GetLexeme ());
+            return errors;
+        }
+        token = lex->GetToken();
         return errors;
     }
-
-//    token = lex->GetToken();
+    errors += Literal();
     
     return errors;
 }
@@ -214,21 +209,10 @@ int SyntacticalAnalyzer::Statement () {
 int SyntacticalAnalyzer::Statement_List () {
     p2file << "Entering Statement_List function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
-    token = lex->GetToken();
-    if (token != IDENT_T && token != LPAREN_T && token != NUMLIT_T && token != STRLIT_T && token != QUOTE_T && token != RPAREN_T) {
-        errors++;
-        lex->ReportError ("Expecting Firsts of Statement_List; saw " + lex->GetLexeme ());
-        return errors;
-    }
-    
     if (token == RPAREN_T) {
-//        token = lex->GetToken();
-        p2file << "Exiting Statement_List function; current token is: " << "LAMBDA" << endl;
-        return errors;
+        return errors; // done
     }
-    // token is not lambda. Continue.
     
-//    token = lex->GetToken();
     errors += Statement();
     errors += Statement_List();
     
@@ -240,11 +224,12 @@ int SyntacticalAnalyzer::Statement_Pair () {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken();
+    
     if (token == LPAREN_T) {
-        errors += Statement_Pair_Body();
         token = lex->GetToken();
+        errors += Statement_Pair_Body();
         if (token == RPAREN_T) {
+            token = lex->GetToken();
             return errors;
         }
         else {
@@ -263,10 +248,9 @@ int SyntacticalAnalyzer::Statement_Pair_Body () {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken();
     if (token == LPAREN_T) {
-        errors += Action();
         token = lex->GetToken();
+        errors += Action();
         if (token != RPAREN_T) {
             errors++;
             lex->ReportError ("Expecting ')'; saw " + lex->GetLexeme ());
@@ -289,11 +273,12 @@ int SyntacticalAnalyzer::Literal () {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-//    token = lex->GetToken(); // should we be getting this token before
     if (token == NUMLIT_T || token == STRLIT_T) {
+        token = lex->GetToken();
         return errors;
     }
     else if (token == QUOTE_T) {
+        token = lex->GetToken();
         errors += Quoted_Lit();
     }
     else {
@@ -314,14 +299,12 @@ int SyntacticalAnalyzer::Quoted_Lit () {
 int SyntacticalAnalyzer::More_Tokens () {
     p2file << "Entering More_Tokens function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
-    if (token == EOF_T)
+    if (token == RPAREN_T)
         return errors;
-    token = lex->GetToken();
-    if (token == LAMBDA || token == EOF_T) {
-        return 0;
-    }
+    
     errors += Any_Other_Token();
-    return errors + More_Tokens();
+    errors += More_Tokens();
+    return errors;
 }
 
 int SyntacticalAnalyzer::Any_Other_Token () {
@@ -329,45 +312,46 @@ int SyntacticalAnalyzer::Any_Other_Token () {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken();
     switch (token) {
         case LPAREN_T:
-            errors += More_Tokens();
             token = lex->GetToken();
+            errors += More_Tokens();
             if (token != RPAREN_T) {
                 errors++;
                 lex->ReportError ("Expecting ')'; saw " + lex->GetLexeme ());
             }
+            token = lex->GetToken();
             break;
-        case IDENT_T:  break;
-        case NUMLIT_T:  break;
-        case STRLIT_T:  break;
-        case CONS_T:  break;
-        case IF_T:  break;
-        case DISPLAY_T:   break;
-        case NEWLINE_T:  break;
-        case LISTOP_T:  break;
-        case AND_T:  break;
-        case OR_T:  break;
-        case NOT_T:   break;
-        case DEFINE_T:  break;
-        case NUMBERP_T:  break;
-        case SYMBOLP_T:  break;
-        case LISTP_T:  break;
-        case ZEROP_T:   break;
-        case NULLP_T:  break;
-        case STRINGP_T:  break;
-        case PLUS_T:  break;
-        case MINUS_T:  break;
-        case DIV_T:   break;
-        case MULT_T:  break;
-        case MODULO_T:  break;
-        case EQUALTO_T:  break;
-        case GT_T:  break;
-        case LT_T:   break;
-        case GTE_T:  break;
-        case LTE_T:  break;
+        case IDENT_T:   token = lex->GetToken(); break;
+        case NUMLIT_T:  token = lex->GetToken(); break;
+        case STRLIT_T:  token = lex->GetToken(); break;
+        case CONS_T:  token = lex->GetToken(); break;
+        case IF_T:  token = lex->GetToken(); break;
+        case DISPLAY_T:   token = lex->GetToken(); break;
+        case NEWLINE_T:  token = lex->GetToken(); break;
+        case LISTOP_T:  token = lex->GetToken(); break;
+        case AND_T:  token = lex->GetToken(); break;
+        case OR_T:  token = lex->GetToken(); break;
+        case NOT_T:   token = lex->GetToken(); break;
+        case DEFINE_T:  token = lex->GetToken(); break;
+        case NUMBERP_T:  token = lex->GetToken(); break;
+        case SYMBOLP_T:  token = lex->GetToken(); break;
+        case LISTP_T:  token = lex->GetToken(); break;
+        case ZEROP_T:   token = lex->GetToken(); break;
+        case NULLP_T:  token = lex->GetToken(); break;
+        case STRINGP_T:  token = lex->GetToken(); break;
+        case PLUS_T:  token = lex->GetToken(); break;
+        case MINUS_T:  token = lex->GetToken(); break;
+        case DIV_T:   token = lex->GetToken(); break;
+        case MULT_T:  token = lex->GetToken(); break;
+        case MODULO_T:  token = lex->GetToken(); break;
+        case EQUALTO_T:  token = lex->GetToken(); break;
+        case GT_T:  token = lex->GetToken(); break;
+        case LT_T:   token = lex->GetToken(); break;
+        case GTE_T:  token = lex->GetToken(); break;
+        case LTE_T:  token = lex->GetToken(); break;
         case QUOTE_T:
+            token = lex->GetToken();
             errors += Any_Other_Token();
             break;
         default:
@@ -383,53 +367,66 @@ int SyntacticalAnalyzer::Action () {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken();
     cout << "Action: getting token " << lex->GetTokenName(token) << endl;
     switch (token) {
         case IF_T:
+            token = lex->GetToken();
             errors += Statement();
             errors += Statement();
             errors += Else_Part();
             break;
         case COND_T:
+            token = lex->GetToken();
             errors += Statement_Pair();
             errors += More_Pairs();
             break;
         case LISTOP_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case CONS_T:
+            token = lex->GetToken();
             errors += Statement();
             errors += Statement();
             break;
         case AND_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case OR_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case NOT_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case NUMBERP_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case SYMBOLP_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case LISTP_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case ZEROP_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case NULLP_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case STRINGP_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case PLUS_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case MINUS_T:
@@ -443,28 +440,36 @@ int SyntacticalAnalyzer::Action () {
             errors += Statement_List();
             break;
         case MULT_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case MODULO_T:
+            token = lex->GetToken();
             errors += Statement();
             errors += Statement();
             break;
         case EQUALTO_T:
+            token = lex->GetToken();
             errors += Statement_List();
             return errors;
         case GT_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case LT_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case GTE_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case LTE_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case IDENT_T:
+            token = lex->GetToken();
             errors += Statement_List();
             break;
         case DISPLAY_T:
@@ -486,10 +491,11 @@ int SyntacticalAnalyzer::Else_Part() {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken();
+    
     if (token == RPAREN_T) {
         return errors;
     }
+    
     errors += Statement();
     return errors;
 }
@@ -499,10 +505,11 @@ int SyntacticalAnalyzer::More_Pairs() {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken();
+    
     if (token == RPAREN_T) {
         return errors; // lambda
     }
+    
     errors += Statement_Pair();
     errors += More_Pairs();
     return errors;
