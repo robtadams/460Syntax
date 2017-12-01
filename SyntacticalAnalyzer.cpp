@@ -125,10 +125,10 @@ int SyntacticalAnalyzer::Define ()
         token = lex->GetToken ();
     }
     
-    errors += Statement();
+    token = lex->GetToken();
+    errors += Statement(); // Return Here
     errors += Statement_List();
     
-    token = lex->GetToken ();
     while (token != RPAREN_T && token != EOF_T)
     {
         errors++;
@@ -151,6 +151,10 @@ int SyntacticalAnalyzer::More_Defines () {
         return errors; // lambda
     }
     token = lex->GetToken();
+    if (token == LPAREN_T) {
+        errors += Statement();
+        errors += Statement_List();
+    }
     // has to be this becaus it is not lambda
     errors += Define();
     errors += More_Defines();
@@ -181,27 +185,28 @@ int SyntacticalAnalyzer::Param_List () {
 int SyntacticalAnalyzer::Statement () {
     p2file << "Entering Statement function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
-    if (token == EOF_T)
-        return errors;
-    token = lex->GetToken();
-    if (token == IDENT_T) {
-        return errors;
-    }
-    else if(token == LPAREN_T) {
-        errors += Action(); // getting token at end of action.
-        while (token != RPAREN_T && token != EOF_T) {
-            errors++;
-            lex->ReportError ("Expecting ')'; saw " + lex->GetLexeme ());
-            token = lex->GetToken ();
-        }
-        return errors;
-    }
-    while (token != NUMLIT_T && token != STRLIT_T && token != QUOTE_T) {
+//    token = lex->GetToken();
+    if (token != IDENT_T && token != LPAREN_T && token != NUMLIT_T && token != STRLIT_T && token != QUOTE_T) {
         errors++;
-        lex->ReportError ("Expecting NUMLIT_T, STRLIT_T, QUOTE_T; saw " + lex->GetLexeme ());
-        token = lex->GetToken ();
+        lex->ReportError ("Expecting Firsts of Statement; saw " + lex->GetLexeme ());
+        return errors;
     }
-    errors += Literal();
+    
+    if (token == IDENT_T || token == NUMLIT_T) {
+        return errors;
+    }
+    else if (token == NUMLIT_T || token == STRLIT_T || token == QUOTE_T) {
+        errors += Literal();
+    }
+    // token HAS to be a LPAREN_T at this point.
+    errors += Action(); // Return here 2
+    if (token != RPAREN_T) {
+        errors++;
+        lex->ReportError ("Expecting ); saw " + lex->GetLexeme ());
+        return errors;
+    }
+
+//    token = lex->GetToken();
     
     return errors;
 }
@@ -209,17 +214,24 @@ int SyntacticalAnalyzer::Statement () {
 int SyntacticalAnalyzer::Statement_List () {
     p2file << "Entering Statement_List function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
-    if (token == EOF_T)
-        return errors;
     token = lex->GetToken();
-    if (token == RPAREN_T) { // check for lambda
-        token = lex->GetToken();
+    if (token != IDENT_T && token != LPAREN_T && token != NUMLIT_T && token != STRLIT_T && token != QUOTE_T && token != RPAREN_T) {
+        errors++;
+        lex->ReportError ("Expecting Firsts of Statement_List; saw " + lex->GetLexeme ());
         return errors;
     }
-    if (token != EOF_T) {
-        errors += Statement();
-        errors += Statement_List();
+    
+    if (token == RPAREN_T) {
+//        token = lex->GetToken();
+        p2file << "Exiting Statement_List function; current token is: " << "LAMBDA" << endl;
+        return errors;
     }
+    // token is not lambda. Continue.
+    
+//    token = lex->GetToken();
+    errors += Statement();
+    errors += Statement_List();
+    
     return errors;
 }
 
@@ -277,15 +289,17 @@ int SyntacticalAnalyzer::Literal () {
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    token = lex->GetToken(); // should we be getting this token before
+//    token = lex->GetToken(); // should we be getting this token before
     if (token == NUMLIT_T || token == STRLIT_T) {
         return errors;
     }
     else if (token == QUOTE_T) {
         errors += Quoted_Lit();
     }
-    errors++;
-    lex->ReportError ("Expecting 'LITERAL'; saw " + lex->GetLexeme ());
+    else {
+        errors++;
+        lex->ReportError ("Expecting 'LITERAL'; saw " + lex->GetLexeme ());
+    }
     return errors;
 }
 
@@ -419,10 +433,12 @@ int SyntacticalAnalyzer::Action () {
             errors += Statement_List();
             break;
         case MINUS_T:
+            token = lex->GetToken();
             errors += Statement();
             errors += Statement_List();
             break;
         case DIV_T:
+            token = lex->GetToken();
             errors += Statement();
             errors += Statement_List();
             break;
@@ -452,15 +468,16 @@ int SyntacticalAnalyzer::Action () {
             errors += Statement_List();
             break;
         case DISPLAY_T:
+            token = lex->GetToken();
             errors += Statement();
             break;
         case NEWLINE_T:
+            token = lex->GetToken();
             break;
         default:
             errors++;
             lex->ReportError ("Expecting 'ACTION'; saw " + lex->GetLexeme ());
     }
-//    token = lex->GetToken();
     return errors;
 }
 
