@@ -1,10 +1,12 @@
 /*******************************************************************************
 * Assignment: Project 1 - Lexical Analyzer for Scheme to C++ Translator        *
-* Author: Dr. Watts                                                             *
+* Author: Dr. Watts                                                            *
 * Date: Fall 2017                                                              *
 * File: LexicalAnalyzer.h                                                      *
 *                                                                              *
-* Description: This file contains the                                          *
+* Description: This file contains the syntactical analyzer class               *
+*   implementation.using these member functions you can check that a scheme    *
+*    program is completely valid by grabbing tokens from the lexical analyzer. *
 *******************************************************************************/
 
 #include <iostream>
@@ -15,11 +17,12 @@
 using namespace std;
 
 /*******************************************************************************
-* Function:                                                                    *
+* Function: SyntacticalAnalyzer                                                *
 *                                                                              *
-* Parameters:                                                                  *
-* Return value:                                                                *
-* Description: This function will                                              *
+* Parameters:  filename (string)                                               *
+* Return value: creates an object of syntactical analyzer                      *
+* Description: This function is the constructor for syntactical analyzer class *
+*   it takes a filename to a scheme program to open and begin processing       *
 *******************************************************************************/
 SyntacticalAnalyzer::SyntacticalAnalyzer (char * filename)
 {
@@ -33,11 +36,12 @@ SyntacticalAnalyzer::SyntacticalAnalyzer (char * filename)
 }
 
 /*******************************************************************************
-* Function:                                                                    *
+* Function: ~SyntacticalAnalyzer                                               *
 *                                                                              *
 * Parameters:                                                                  *
 * Return value:                                                                *
-* Description: This function will                                              *
+* Description: This function will manage the memory used by the class after    *
+*   the users object is done being used                                        *
 *******************************************************************************/
 SyntacticalAnalyzer::~SyntacticalAnalyzer ()
 {
@@ -46,11 +50,12 @@ SyntacticalAnalyzer::~SyntacticalAnalyzer ()
 }
 
 /*******************************************************************************
-* Function:                                                                    *
+* Function: Program                                                            *
 *                                                                              *
 * Parameters:                                                                  *
-* Return value:                                                                *
-* Description: This function will                                              *
+* Return value:  num errors (int)                                              *
+* Description: This function will handle the entire definition of a program    *
+*    comprised of defines                                                      *
 *******************************************************************************/
 int SyntacticalAnalyzer::Program ()
 {
@@ -74,11 +79,13 @@ int SyntacticalAnalyzer::Program ()
 
 
 /*******************************************************************************
-* Function:                                                                    *
+* Function: Define                                                             *
 *                                                                              *
 * Parameters:                                                                  *
-* Return value:                                                                *
-* Description: This function will                                              *
+* Return value:  num errors (int)                                              *
+* Description: This function will handle one function definition by checking   *
+*   the firsts of define (define(lit params) * )                               *
+*   otherwise it will report an error to the user                              *
 *******************************************************************************/
 int SyntacticalAnalyzer::Define ()
 {
@@ -117,6 +124,7 @@ int SyntacticalAnalyzer::Define ()
     }
     token = lex->GetToken();
     
+    // check for params
     errors += Param_List();
     
     while (token != RPAREN_T && token != EOF_T)
@@ -126,6 +134,7 @@ int SyntacticalAnalyzer::Define ()
         token = lex->GetToken ();
     }
     
+    // find the inner statements of define
     token = lex->GetToken();
     errors += Statement();
     errors += Statement_List();
@@ -145,7 +154,14 @@ int SyntacticalAnalyzer::Define ()
 	return errors;
 }
 
-
+/*******************************************************************************
+ * Function: More_Defines                                                       *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: This function will continue to call defines until               *
+ *        it reaches the end of the function body                               *
+ *******************************************************************************/
 int SyntacticalAnalyzer::More_Defines () {
     p2file << "Entering More_Defines function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -162,6 +178,14 @@ int SyntacticalAnalyzer::More_Defines () {
     return errors;
 }
 
+
+/*******************************************************************************
+ * Function: Param_List                                                         *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: This function will get all of the parameters for a function     *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Param_List () {
     p2file << "Entering Param_List function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -182,6 +206,13 @@ int SyntacticalAnalyzer::Param_List () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Statement                                                          *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: This function handles one scheme statement e.g. (+ 2 4)         *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Statement () {
     p2file << "Entering Statement function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -206,6 +237,15 @@ int SyntacticalAnalyzer::Statement () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Statement                                                          *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: This function checks if there are any more statements inside    *
+ *    of the function body, and keeps getting statements until the function is  *
+ *   finished                                                                   *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Statement_List () {
     p2file << "Entering Statement_List function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -219,6 +259,14 @@ int SyntacticalAnalyzer::Statement_List () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Statement_Pair                                                     *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: This function checks for the pair of statements inside of a     *
+ *            cond statement.                                                   *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Statement_Pair () {
     p2file << "Entering Statement_Pair function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -243,6 +291,13 @@ int SyntacticalAnalyzer::Statement_Pair () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Statement_Pair_Body                                                *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: Gets the statements inside of the statement pair body           *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Statement_Pair_Body () {
     p2file << "Entering Statement_Pair_Body function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -268,6 +323,13 @@ int SyntacticalAnalyzer::Statement_Pair_Body () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Literal                                                            *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: Checks for a word, number or quote.                             *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Literal () {
     p2file << "Entering Literal function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -288,6 +350,13 @@ int SyntacticalAnalyzer::Literal () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Quoted_Lit                                                         *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: Gets the token for a 'literal in scheme                         *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Quoted_Lit () {
     p2file << "Entering Quoted_Lit function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -296,6 +365,13 @@ int SyntacticalAnalyzer::Quoted_Lit () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: More_Tokens                                                        *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: Keeps calling Any_Other_Token until all tokens are grabbed      *
+ *******************************************************************************/
 int SyntacticalAnalyzer::More_Tokens () {
     p2file << "Entering More_Tokens function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -307,6 +383,14 @@ int SyntacticalAnalyzer::More_Tokens () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Any_Other_Token                                                    *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: Makes sure that the token is a valid token option for a         *
+ *        quoted lit                                                            *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Any_Other_Token () {
     p2file << "Entering Any_Other_Token function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -361,13 +445,20 @@ int SyntacticalAnalyzer::Any_Other_Token () {
     return errors; 
 }
 
+/*******************************************************************************
+ * Function: Action                                                             *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: For every action, this function calls the necessary             *
+ *    function to ensure the following tokens are valid and present.            *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Action () {
     // add gget token to each switch //done
     p2file << "Entering Action function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
     if (token == EOF_T)
         return errors;
-    cout << "Action: getting token " << lex->GetTokenName(token) << endl;
     switch (token) {
         case IF_T:
             token = lex->GetToken();
@@ -486,6 +577,13 @@ int SyntacticalAnalyzer::Action () {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: Else_Part                                                          *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: Handles the else that follows an IF_T action                    *
+ *******************************************************************************/
 int SyntacticalAnalyzer::Else_Part() {
     p2file << "Entering Else_Part function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
@@ -500,6 +598,14 @@ int SyntacticalAnalyzer::Else_Part() {
     return errors;
 }
 
+/*******************************************************************************
+ * Function: More_Pairs                                                         *
+ *                                                                              *
+ * Parameters:                                                                  *
+ * Return value:  num errors (int)                                              *
+ * Description: Continues to get statement pairs for a cond until the           *
+ *    condition body is terminated                                              *
+ *******************************************************************************/
 int SyntacticalAnalyzer::More_Pairs() {
     p2file << "Entering More_Pairs function; current token is: " << lex->GetTokenName (token) << endl;
     int errors = 0;
